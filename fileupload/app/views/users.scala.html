@@ -1,0 +1,15 @@
+@(users: List[User])
+
+@main("user list") {
+        
+  <h2>user list:</h2>
+  
+  <ul>
+    @users.map { user =>
+      <li>
+          @user.email
+      </li>
+    }
+  </ul>
+
+}

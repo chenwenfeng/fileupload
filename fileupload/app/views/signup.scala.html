@@ -1,0 +1,19 @@
+@(userForm: Form[User])
+
+@import helper._
+
+@main("signup") {
+        
+  <h2>signup</h2>
+  
+
+  @form(routes.Application.createUser) {
+      
+    @inputText(userForm("email")) 
+    @inputPassword(userForm("password")) 
+    
+    <input type="submit" value="Signup">
+      
+  }
+    
+}
