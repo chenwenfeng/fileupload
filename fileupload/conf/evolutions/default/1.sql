@@ -13,7 +13,7 @@ CREATE TABLE Pack (
   id bigint(20) NOT NULL AUTO_INCREMENT,
   email varchar(255) NOT NULL,
   pack varchar(255) NOT NULL,
-  pictures array,
+  pictures array NOT NULL,
   PRIMARY KEY (id)
 );
 

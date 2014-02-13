@@ -24,7 +24,7 @@
 
     @form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
       
-      <input type="file" name="picture">
+      <input type="file" name="picture[]" multiple="multiple" accept="image/*">
       
       <p>
           <input type="submit">

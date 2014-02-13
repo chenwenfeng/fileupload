@@ -34,16 +34,53 @@ object User {
     }
   }
 
-  def pictures(email: String, pack: String): List[String] = {
+  def checkPackNameAvaiable(email: String, packName: String): Boolean = {
+    packs(email).indexOf(packName) == -1
+  }
+
+
+
+  def getPictures(email: String, pack: String): List[String] = {
     DB.withConnection { implicit c =>
       SQL(
         """
           select pictures from Pack p
-          where p.user = {email} and p.pack = {pack};
+          where p.email = {email} and p.pack = {pack};
         """
-      ).on("email" -> email, "pack" -> pack).apply().head match {
-        case Row(Some(pictures: List[String])) => pictures
-        case _ => Nil
+      ).on("email" -> email, "pack" -> pack)().map {
+        case Row(pictures: Array[String]) => pictures.toList
+      }.headOption.getOrElse(Nil)
+    }
+  }
+
+  def checkPicturesExist(email: String, packName: String): Boolean = {
+    DB.withConnection { implicit c =>
+      SQL(
+        """
+          select count(*) from Pack p
+          where p.email = {email} and p.pack = {pack};
+        """
+      ).on("email" -> email, "pack" -> packName).as(scalar[Long].single) == 1
+    }
+  }
+
+  def updatePack(email: String, packName: String, pictures: List[String]) {
+    if(checkPicturesExist(email, packName)) {
+      val pictureList = getPictures(email, packName) ++ pictures
+      DB.withConnection { implicit c =>
+        val r = SQL(
+          """
+            update Pack p set pictures = {pictureList}
+            where p.email = {email} and p.pack = {packName};
+          """
+        ).on("pictureList" -> pictureList, "email" -> email, "packName" -> packName).executeUpdate()
+        println(r)
+      }
+    } else {
+      DB.withConnection { implicit c =>
+        val id: Option[Long] = SQL("insert into Pack(email, pack, pictures) values ({email}, {pack}, {pictures})")
+          .on('email -> email, 'pack -> packName, 'pictures -> pictures).executeInsert()
+        println(id)
       }
     }
   }

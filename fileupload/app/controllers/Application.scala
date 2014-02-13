@@ -1,5 +1,7 @@
 package controllers
 
+import scala.util._
+
 import play.api._
 import play.api.mvc._
 import play.api.data._
@@ -37,7 +39,7 @@ object Application extends Controller {
   def packEdit(pack: String) = Action { implicit request =>
     request.cookies.get("token") match {
       case Some(c) =>
-        val pictures = User.pictures(c.value, pack)
+        val pictures = User.getPictures(c.value, pack)
         Ok(views.html.pack(c.value, "edit", pictures))
       case None => Redirect(routes.Application.signin)
     }
@@ -58,17 +60,23 @@ object Application extends Controller {
       case Some(c) => c.value
       case None => ""
     }
+    val packName = "xx"
     if(email != "") {
-      request.body.file("picture").map { picture =>
+      val now = System.currentTimeMillis
+      val pictureNames = (for(picture <- request.body.files.toArray) yield {
         import java.io.File
-        val now = System.currentTimeMillis
-        val filename = email + '_' + now + picture.filename.substring(picture.filename.lastIndexOf("."))
+        val random = Random.nextInt(10000)
+        val filename = email + '_' + now + '_' + random + picture.filename.substring(picture.filename.lastIndexOf("."))
         val contentType = picture.contentType
         picture.ref.moveTo(new File(s"public/uploadpictures/$filename"))
-        Redirect(routes.Application.index)
-      }.getOrElse {
-        Redirect(routes.Application.index).flashing(
+        filename
+      }).toList
+      if(pictureNames.size == 0) {
+        Redirect(routes.Application.packEdit(packName)).flashing(
           "error" -> "Missing file")
+      } else {
+        User.updatePack(email, packName, pictureNames)
+        Redirect(routes.Application.packEdit(packName))
       }
     } else {
       Redirect(routes.Application.signin)
@@ -76,7 +84,16 @@ object Application extends Controller {
       
   }
 
-
+  // def ajaxUpload = Action(parse.temporaryFile) { request =>
+  //   val email = request.cookies.get("token") match {
+  //     case Some(c) => c.value
+  //     case None => ""
+  //   }
+  //   // val now = System.currentTimeMillis
+  //   // val filename = email + '_' + now + picture.filename.substring(picture.filename.lastIndexOf("."))
+  //   request.body.moveTo(new File("public/uploadpictures/ajax"))
+  //   Ok("File uploaded")
+  // }
 
 
   def users = Action {
