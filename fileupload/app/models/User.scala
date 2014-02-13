@@ -38,18 +38,31 @@ object User {
     packs(email).indexOf(packName) == -1
   }
 
+  implicit def rowToStringArray: Column[Array[String]] = {
+    Column.nonNull[Array[String]] { (value, meta) =>
+      val MetaDataItem(qualified, nullable, clazz) = meta
+      value match {
+        case ss: Array[String] => Right(ss)
+        case _ => Left(TypeDoesNotMatch("..."))
+      }
+    }
+  }
 
 
   def getPictures(email: String, pack: String): List[String] = {
     DB.withConnection { implicit c =>
-      SQL(
+      val results: Stream[Array[String]] = SQL(
         """
           select pictures from Pack p
           where p.email = {email} and p.pack = {pack};
         """
-      ).on("email" -> email, "pack" -> pack)().map {
-        case Row(pictures: Array[String]) => pictures.toList
-      }.headOption.getOrElse(Nil)
+      ).on("email" -> email, "pack" -> pack)().map { row =>
+        row[Array[String]]("pictures")
+      }
+      results.headOption match {
+        case Some(x) => x.toList
+        case None => Nil
+      }
     }
   }
 
@@ -66,7 +79,7 @@ object User {
 
   def updatePack(email: String, packName: String, pictures: List[String]) {
     if(checkPicturesExist(email, packName)) {
-      val pictureList = getPictures(email, packName) ++ pictures
+      val pictureList = (getPictures(email, packName) ++ pictures).toArray
       DB.withConnection { implicit c =>
         val r = SQL(
           """
@@ -77,6 +90,7 @@ object User {
         println(r)
       }
     } else {
+      val pictureList = pictures.toArray
       DB.withConnection { implicit c =>
         val id: Option[Long] = SQL("insert into Pack(email, pack, pictures) values ({email}, {pack}, {pictures})")
           .on('email -> email, 'pack -> packName, 'pictures -> pictures).executeInsert()
