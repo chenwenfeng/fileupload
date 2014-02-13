@@ -20,6 +20,35 @@ object User {
     }
   }
   
+  def packs(email: String): List[String] = {
+    DB.withConnection { implicit c =>
+      SQL(
+        """
+          select packs from User u
+          where u.email = {email};
+        """
+      ).on("email" -> email).apply().head match {
+        case Row(Some(packs: List[String])) => packs
+        case _ => Nil
+      }
+    }
+  }
+
+  def pictures(email: String, pack: String): List[String] = {
+    DB.withConnection { implicit c =>
+      SQL(
+        """
+          select pictures from Pack p
+          where p.user = {email} and p.pack = {pack};
+        """
+      ).on("email" -> email, "pack" -> pack).apply().head match {
+        case Row(Some(pictures: List[String])) => pictures
+        case _ => Nil
+      }
+    }
+  }
+
+
   def create(email: String, password: String) {
     DB.withConnection { implicit c =>
       val id: Option[Long] = SQL("insert into User(email, password) values ({email}, {password})")
@@ -32,10 +61,22 @@ object User {
       val count = SQL(
         """
           select count(*) from User u  
-          where u.email = {email} and u.password == {password};
+          where u.email = {email} and u.password = {password};
         """
       ).on("email" -> email, "password" -> password).as(scalar[Long].single)
       count == 1
+    }
+  }
+
+  def checkAvaiable(email: String): Boolean = {
+    DB.withConnection { implicit c =>
+      val count = SQL(
+        """
+          select count(*) from User u  
+          where u.email = {email};
+        """
+      ).on("email" -> email).as(scalar[Long].single)
+      count == 0
     }
   } 
 }

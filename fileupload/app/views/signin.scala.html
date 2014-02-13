@@ -1,0 +1,19 @@
+@(userForm: Form[User])
+
+@import helper._
+
+@main("signin") {
+        
+  <h2>signin</h2>
+  
+
+  @form(routes.Application.login) {
+      
+    @inputText(userForm("email")) 
+    @inputPassword(userForm("password")) 
+    
+    <input type="submit" value="Signin">
+      
+  }
+
+}

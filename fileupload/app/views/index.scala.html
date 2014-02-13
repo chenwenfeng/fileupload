@@ -1,8 +1,26 @@
-@(email: String = "")
+@(email: String, packs: List[String])
 
-@main("file upload") {
-        
-  <h2>file upload: @email</h2>
+@import helper._
+
+
+@main("cms") {
   
+  <div id="index">
+    <h1>@email</h1>
+
+    <div class="packs">
+      @for(pack <- packs) {
+        <div class="pack">
+          @pack
+          <a href="@routes.Application.packEdit(pack)" class="edit">edit</a>
+          <div class="delete" data="@pack">delete</div>
+        </div>
+      }
+    </div>
+
+    <div class="pack">
+      <a href="@routes.Application.packNew">add</a>
+    </div>
+  </div>
 
 }

@@ -1,0 +1,35 @@
+@(email: String = "", method: String, pictures: List[String])
+
+@import helper._
+
+
+@main("pack") {
+
+  <div id="pack-page"> 
+    <h1>
+      @if(method == "new") {
+        add
+      } else {
+        edit
+      }
+    </h2>
+    
+    <div class="pictures">
+      @for(p <- pictures) {
+        <img src="@routes.Assets.at("uploadpictures/" + p)" />
+      }
+    </div>
+
+
+
+    @form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
+      
+      <input type="file" name="picture">
+      
+      <p>
+          <input type="submit">
+      </p>
+      
+    }
+  </div>
+}

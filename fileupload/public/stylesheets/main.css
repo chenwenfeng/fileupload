@@ -1,0 +1,30 @@
+body {
+  width: 980px;
+  margin: auto;
+}
+
+#index {
+
+}
+
+#index .packs {
+  
+}
+#index .pack {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  display: inline-block;
+  border: 2px solid #aaa;
+  text-align: center;
+}
+#index .pack .edit {
+
+}
+#index .pack .delete {
+
+}
+#index .pack .add {
+
+}
+

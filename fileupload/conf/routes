@@ -4,6 +4,11 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /new                        controllers.Application.packNew
+GET     /edit/:pack                 controllers.Application.packEdit(pack: String)
+POST    /edit/:pack                 controllers.Application.packSave(pack: String)
+
+POST    /upload                     controllers.Application.upload
 
 # User
 GET     /users                      controllers.Application.users
