@@ -46,12 +46,11 @@ object Application extends Controller {
     }
   }
 
-  def upload = Action(parse.multipartFormData) { request =>
+  def upload(packName: String) = Action(parse.multipartFormData) { request =>
     val email = request.cookies.get("token") match {
       case Some(c) => c.value
       case None => ""
     }
-    val packName = "xx"
     if(email != "") {
       val now = System.currentTimeMillis
       val pictureNames = (for(picture <- request.body.files.toArray) yield {
@@ -77,6 +76,10 @@ object Application extends Controller {
 
   def deletePic(email: String, packName: String, picName: String) = Action {
     Ok(Json.obj("result" -> User.deletePic(email, packName, picName)))
+  }
+
+  def deletePack(email: String, packName: String) = Action {
+    Ok(Json.obj("result" -> User.deletePack(email, packName)))
   }
 
 

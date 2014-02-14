@@ -7,9 +7,10 @@ GET     /                           controllers.Application.index
 GET     /new                        controllers.Application.packNew
 GET     /edit/:pack                 controllers.Application.packEdit(pack: String)
 
-POST    /upload                     controllers.Application.upload
+POST    /upload/:pack               controllers.Application.upload(pack: String)
 
 GET     /delete/:email/:pack/:pic   controllers.Application.deletePic(email, pack, pic)
+GET     /delete/:email/:pack        controllers.Application.deletePack(email, pack)
 
 # User
 GET     /users                      controllers.Application.users

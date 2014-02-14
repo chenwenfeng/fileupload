@@ -5,7 +5,7 @@
 
 @main("cms") {
   
-  <div id="index">
+  <div id="index" email="@email">
     <h1>@email</h1>
 
     <div class="packs">
@@ -25,6 +25,27 @@
 
   <script type="text/javascript">
     $(function() {
+      var email = $('#index').attr('email');
+      var packs = $('#index .pack');
+      var deletePacks = $('#index .delete');
+      deletePacks.each(function(i, d) {
+        $(d).click(function() {
+          var packName = $(d).attr('data');
+          var url = 'delete/' + email + '/' + packName;
+          $.getJSON(url, function(data, status, xhr) {
+            if(xhr.status == 200) {
+              if(data.result) {
+                packs[i].remove();
+              } else {
+                alert('删除失败，请重试');
+              }
+            } else {
+              alert('删除失败，请重试');
+            }
+          });
+        });
+      });
+
     });
   </script>
 }

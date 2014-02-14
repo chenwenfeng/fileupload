@@ -123,6 +123,33 @@ object User {
     }
   }
 
+  def deletePack(email: String, packName: String): Boolean = {
+    val old = packs(email)
+    val index = old.indexOf(packName)
+    if(index != -1) {
+      val newList = removeIndex(old, index).mkString(",")
+      DB.withConnection { implicit c =>
+        SQL(
+          """
+            update User u set packs = {packList}
+            where u.email = {email};
+          """
+        ).on("packList" -> newList, "email" -> email).executeUpdate()
+      }
+      DB.withConnection { implicit c =>
+        SQL(
+          """
+            delete from Pack p 
+            where p.email = {email} and p.pack = {packName};
+          """
+        ).on("email" -> email, "packName" -> packName).executeUpdate()
+      }
+      true
+    } else {
+      false
+    }
+  }
+
 
   def create(email: String, password: String) {
     DB.withConnection { implicit c =>
