@@ -1,22 +1,27 @@
-@(email: String = "", method: String, pictures: List[String])
+@(email: String = "", method: String, packName: String, pictures: List[String])
 
 @import helper._
 
 
 @main("pack") {
 
-  <div id="pack-page"> 
-    <h1>
-      @if(method == "new") {
-        add
-      } else {
-        edit
-      }
-    </h2>
+  <div id="pack-page" email="@email" packName="@packName"> 
+    @if(method == "new") {
+      <h1>add</h1>
+      packname: <input type="text" class="pack-name-input input" plackholder="packname">
+      <span class="tip"></span>
+    } else {
+      <h1>edit</h1>
+      packname: @packName
+    }
     
+    <h2>upload list:</h2>
     <div class="pictures">
       @for(p <- pictures) {
-        <img src="@routes.Assets.at("uploadpictures/" + p)" />
+        <div class="picture">
+          <img src="@routes.Assets.at("uploadpictures/" + p)" />
+          <div class="delete" picName="@p">delete</div>
+        </div>
       }
     </div>
 
@@ -24,7 +29,7 @@
 
     @form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
       
-      <input type="file" name="picture[]" multiple="multiple" accept="image/*">
+      <input type="file" name="picture[]" multiple="multiple" accept="image/*" class="file-input">
       
       <p>
           <input type="submit">
@@ -32,4 +37,67 @@
       
     }
   </div>
+
+  <script type="text/javascript">
+    $(function() {
+      var page = $('#pack-page');
+      var email = page.attr('email');
+      var packName = page.attr('packName');
+      
+      var pictures = $('#pack-page .picture');
+      
+      var pictureDeletes = $('#pack-page .delete');
+      pictureDeletes.each(function(i, d) {
+        $(d).click(function() {
+          var picName = $(d).attr('picName');
+          var url = '/delete/' + email + '/' + packName + '/' + picName;
+          $.getJSON(url, function(data, status, xhr) {
+            if(xhr.status == 200) {
+              if(data.result) {
+                pictures[i].remove();
+              } else {
+                alert('删除失败，请重试');
+              }
+            } else {
+              alert('删除失败，请重试');
+            }
+          });
+        });
+      });
+
+      var packNameInput = $('pack-page .pack-name-input');
+      var packNameTip = $('pack-page .tip');
+      var fileInput = $('pack-page .file-input');
+      if(packNameInput[0]) {
+        packNameInput.blur(function() {
+          if(packNameInput.val().indexOf(',') >= 0) {
+            packNameTip.html('名字不能含有“,”');
+          } else {
+            packNameTip.html('');
+          }
+        });
+      }
+
+      var form = $('#pack-page form');
+      form.submit(function() {
+        var flag = true;
+        if(packNameInput[0]) {
+          var packName = packNameInput.val();
+          if(packName && packName.indexOf(',') < 0) {
+            packNameTip.html('');
+          } else {
+            flag = false;
+            packNameTip.html('名字不能为空且不能含有“,”');
+          }
+        } else {
+          if(!fileInput.val()) {
+            flag = false;
+          }
+        }
+        if(flag) {
+          this.submit();
+        }
+      });
+    });
+  </script>
 }

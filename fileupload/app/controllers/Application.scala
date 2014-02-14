@@ -6,6 +6,7 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.libs.json._
 
 import models._
 
@@ -31,7 +32,7 @@ object Application extends Controller {
   def packNew = Action {implicit request =>
     request.cookies.get("token") match {
       case Some(c) =>
-        Ok(views.html.pack(c.value, "new", Nil))
+        Ok(views.html.pack(c.value, "new", "", Nil))
       case None => Redirect(routes.Application.signin)
     }
   }
@@ -40,20 +41,10 @@ object Application extends Controller {
     request.cookies.get("token") match {
       case Some(c) =>
         val pictures = User.getPictures(c.value, pack)
-        Ok(views.html.pack(c.value, "edit", pictures))
+        Ok(views.html.pack(c.value, "edit", pack, pictures))
       case None => Redirect(routes.Application.signin)
     }
   }
-
-  def packSave(pack: String) = Action { implicit request =>
-    val email = request.cookies.get("token") match {
-      case Some(c) => c.value
-      case None => ""
-    }
-    // save
-    Redirect(routes.Application.packEdit(pack))
-  }
-
 
   def upload = Action(parse.multipartFormData) { request =>
     val email = request.cookies.get("token") match {
@@ -84,16 +75,9 @@ object Application extends Controller {
       
   }
 
-  // def ajaxUpload = Action(parse.temporaryFile) { request =>
-  //   val email = request.cookies.get("token") match {
-  //     case Some(c) => c.value
-  //     case None => ""
-  //   }
-  //   // val now = System.currentTimeMillis
-  //   // val filename = email + '_' + now + picture.filename.substring(picture.filename.lastIndexOf("."))
-  //   request.body.moveTo(new File("public/uploadpictures/ajax"))
-  //   Ok("File uploaded")
-  // }
+  def deletePic(email: String, packName: String, picName: String) = Action {
+    Ok(Json.obj("result" -> User.deletePic(email, packName, picName)))
+  }
 
 
   def users = Action {

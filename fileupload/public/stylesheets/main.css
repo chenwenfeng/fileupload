@@ -17,6 +17,7 @@ body {
   display: inline-block;
   border: 2px solid #aaa;
   text-align: center;
+  vertical-align: top;
 }
 #index .pack .edit {
 
@@ -28,3 +29,28 @@ body {
 
 }
 
+#pack-page {
+  
+}
+
+#pack-page .pictures {
+  
+}
+
+#pack-page .picture {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  display: inline-block;
+  border: 2px solid #aaa;
+  text-align: center;
+  vertical-align: top;
+}
+
+#pack-page .picture img {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+#pack-page .picture .delete {
+}
