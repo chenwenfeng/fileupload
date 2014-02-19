@@ -1,6 +1,8 @@
 body {
-  width: 980px;
-  margin: auto;
+  width: 1024px;
+  padding: 0;
+  margin: 0 auto;
+  min-height: 768px;
 }
 
 #index {
@@ -53,4 +55,19 @@ body {
 }
 
 #pack-page .picture .delete {
+}
+
+#signin {
+  background: #DDD;
+  min-height: 768px;
+}
+.signin-panel {
+  width: 280px;
+  padding: 15px;
+  margin: auto;
+  background: #FFF;
+  border-radius: 5px;
+}
+.signin-panel form {
+  padding-top: 170px;
 }

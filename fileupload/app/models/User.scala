@@ -7,6 +7,7 @@ import anorm.SqlParser._
 import play.api.db._
 
 case class User(email: String, password: String)
+case class Pack(packName: String, status: Int = -1, iapid: String = "")
 
 object User {
   
@@ -34,6 +35,20 @@ object User {
     }
   }
 
+  def getAllPacks: List[Pack] = {
+    DB.withConnection { implicit c =>
+      val packs = SQL("select * from Pack").apply().map(row => 
+        Pack(
+          row[String]("email"),
+          row[Option[Int]]("status").getOrElse(-1),
+          row[Option[String]]("iapid").getOrElse("")
+        )
+      ).toList
+      packs
+    }
+  }
+
+
   def checkPackNameAvaiable(email: String, packName: String): Boolean = {
     packs(email).indexOf(packName) == -1
   }
@@ -46,6 +61,20 @@ object User {
           where p.email = {email} and p.pack = {pack};
         """
       ).on("email" -> email, "pack" -> pack).apply().head match {
+        case Row(Some(pictures: String)) => pictures.split(",").toList
+        case _ => Nil
+      }
+    }
+  }
+
+  def getPicturesByPackName(pack: String): List[String] = {
+    DB.withConnection { implicit c =>
+      SQL(
+        """
+          select pictures from Pack p
+          where p.pack = {pack};
+        """
+      ).on("pack" -> pack).apply().head match {
         case Row(Some(pictures: String)) => pictures.split(",").toList
         case _ => Nil
       }

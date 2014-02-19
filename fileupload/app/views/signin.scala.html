@@ -3,17 +3,18 @@
 @import helper._
 
 @main("signin") {
+  <div id="signin">    
+    <div class="signin-panel">
+      @form(action=routes.Application.login, 'class->"form-signin") {
+        <h2 class="form-signin-heading">CC Mangement System</h2>
+        <div class=""></div>
+        @inputText(userForm("email"), 'class->"form-control", 'placeholder->"username", 'required->true, 'autofocus->true) 
+        @inputPassword(userForm("password"), 'class->"form-control", 'placeholder->"password", 'required->true, 'autofocus->true) 
         
-  <h2>signin</h2>
-  
-
-  @form(routes.Application.login) {
-      
-    @inputText(userForm("email")) 
-    @inputPassword(userForm("password")) 
-    
-    <input type="submit" value="Signin">
-      
-  }
-  <a href="@routes.Application.signup">signup</a>
+        <input type="submit" value="Signin">
+          
+      }
+    </div>
+    <a href="@routes.Application.signup">signup</a>
+  </div>
 }

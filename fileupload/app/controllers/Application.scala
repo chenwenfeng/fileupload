@@ -14,8 +14,8 @@ import models._
 object Application extends Controller {
   val userForm = Form(
     mapping(
-      "email" -> email,
-      "password" -> nonEmptyText(minLength = 3, maxLength = 32)
+      "email" -> text,
+      "password" -> text
     )(User.apply)(User.unapply)
   )
 
@@ -120,6 +120,18 @@ object Application extends Controller {
         }
       }
     )
+  }
+
+  implicit val packFormat = Json.format[Pack]
+
+  def apiPacks = Action {
+    val packs = User.getAllPacks
+    Ok(Json.toJson(packs))
+  }
+
+  def apiPictures(packName: String) = Action {
+    val pictures = User.getPicturesByPackName(packName)
+    Ok(Json.toJson(pictures))
   }
 
 }

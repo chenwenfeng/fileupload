@@ -19,5 +19,10 @@ POST    /signup                     controllers.Application.createUser
 GET     /signin                     controllers.Application.signin
 POST    /signin                     controllers.Application.login
 
+# app api
+GET     /api/packs                  controllers.Application.apiPacks
+GET     /api/picture/:pack          controllers.Application.apiPictures(pack)
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
